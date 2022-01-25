@@ -145,6 +145,10 @@ http:
       redirectScheme:
         scheme: https
 
+    #authelia:
+      #forwardAuth:
+        #address: "http://authelia:9091/api/verify?rd=https://auth.local.example.com"
+
     default-headers:
       headers:
         frameDeny: true
