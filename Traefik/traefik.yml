@@ -1,0 +1,109 @@
+## STATIC CONFIGURATION
+global:
+  checkNewVersion: true
+  sendAnonymousUsage: true
+
+api:
+  #insecure: true
+  dashboard: true
+  debug: true
+
+entryPoints:
+  web:
+    address: :80
+    #http:
+      #redirections:
+        #entryPoint:
+          #to: websecure
+          #scheme: https
+
+  websecure:
+    address: :443
+    #http:
+      #tls:
+        #certResolver: leresolver
+        #domains:
+          #- main: domain.com
+            #sans:
+              #- *.domain.com
+  metrics:
+    address: ":8080"
+
+serversTransport:
+  insecureSkipVerify: true
+
+#log:
+  #level: DEBUG
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    #network: proxy
+  file:
+    filename: /config.yml
+
+certificatesResolvers:
+  leresolver:
+    acme:
+      #caServer: https://acme-staging-v02.api.letsencrypt.org/directory
+      email: email@domain.com
+      storage: acme.json
+      dnsChallenge:
+        provider: cloudflare
+        resolvers:
+          - "1.1.1.1:53"
+          - "1.0.0.1:53"
+        #disablePropagationCheck: true
+#rest:
+    #insecure: true
+
+metrics:
+  prometheus:
+    #buckets:
+    #- 42
+    #- 42
+    #addEntryPointsLabels: true
+    addRoutersLabels: true
+    #addServicesLabels: true
+    entryPoint: metrics
+    #manualRouting: true
+  #datadog:
+    #3address: foobar
+    #pushInterval: 42
+    #addEntryPointsLabels: true
+    #addRoutersLabels: true
+    #addServicesLabels: true
+    #prefix: foobar
+  #statsD:
+    #address: foobar
+    #pushInterval: 42
+    #addEntryPointsLabels: true
+    #addRoutersLabels: true
+    #addServicesLabels: true
+    #prefix: foobar
+  #influxDB:
+    #address: foobar
+    #protocol: foobar
+    #pushInterval: 42
+    #database: foobar
+    #retentionPolicy: foobar
+    #username: foobar
+    #password: foobar
+    #addEntryPointsLabels: true
+    #addRoutersLabels: true
+    #addServicesLabels: true
+    #additionalLabels:
+      #foobar: foobar
+
+#hostResolver:
+  #cnameFlattening: true
+  #resolvConfig: foobar
+  #resolvDepth: 42
+
+pilot:
+  token: ""
+  dashboard: true
+experimental:
+  #kubernetesGateway: true
+  http3: true

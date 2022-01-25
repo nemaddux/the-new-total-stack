@@ -1,0 +1,64 @@
+version: "3.8"
+
+services:
+  traefik:
+    image: "traefik:2.6.0"
+    container_name: "traefik"
+    networks:
+      - proxy
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+      #- "8092:8092"
+    environment:
+      - CF_API_EMAIL=
+      - CF_API_KEY=
+      #- "CF_ZONE_API_TOKEN="
+      #- "CF_DNS_API_TOKEN="
+      #- "TRAEFIK_PILOT_TOKEN="
+    #logging:
+      #driver: loki
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /opt/traefik/traefik.yml:/traefik.yml:ro
+      - /opt/traefik/acme.json:/acme.json
+      - /opt/traefik/config.yml:/config.yml:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.entrypoints=web"
+      - "traefik.http.routers.traefik.rule=Host(`traefik-dashboard.local.domain.com`)"
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=username:$$password$$"
+      - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
+      - "traefik.http.routers.traefik-secure.entrypoints=websecure"
+      - "traefik.http.routers.traefik-secure.rule=Host(`traefik-dashboard.local.domain.com`)"
+      - "traefik.http.routers.traefik-secure.middlewares=traefik-auth"
+      - "traefik.http.routers.traefik-secure.tls=true"
+      - "traefik.http.routers.traefik-secure.tls.certresolver=leresolver"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].main=local.domain.com"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.local.domain.com"
+      - "traefik.http.routers.traefik-secure.service=api@internal"
+      #- "traefik.http.services.traefik-secure.loadbalancer.server.port=8080"
+
+networks:
+  proxy:
+    external: true
+
+  whoami:
+    image: "traefik/whoami:latest"
+    container_name: "simple-service"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.local.domain.com`)"
+      - "traefik.http.routers.whoami.entrypoints=websecure"
+      - "traefik.http.routers.whoami.tls.certresolver=leresolver"
+    logging:
+      driver: loki
+
+networks:
+  proxy:
+    external: true
+       # name: $DEFAULT_NETWORK

@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  portainer:
+    image: portainer/portainer-ce
+    container_name: portainer
+    command: -H unix:///var/run/docker.sock
+    restart: unless-stopped
+    #networks:
+      #- proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      #- /home/username/Portainer/data:/data
+      - ./portainer-data:/data
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 9000:9000
+      - 9443:9443
+      #- 8000:8000
+    #labels:
+      #- "traefik.enable=true"
+      #- "traefik.http.routers.portainer.rule=Host(`portainer.local.domain.com`)"
+      #- "traefik.http.routers.portainer.entrypoints=web"
+      #- "traefik.http.routers.portainer-secure.rule=Host(`portainer.local.domain.com`)"
+      #- "traefik.http.middlewares.portainer-https-redirect.redirectscheme.scheme=https"
+      #- "traefik.http.routers.portainer.middlewares=portainer-https-redirect"
+      #- "traefik.http.routers.portainer-secure.entrypoints=websecure"
+      #- "traefik.http.services.portainer.loadbalancer.server.port=9000"
+      #- "traefik.http.services.portainer.loadbalancer.server.port=9443"
+      #- "traefik.http.routers.portainer.tls=true"
+      #- "traefik.http.routers.portainer-secure.service=portainer"
+      #- "traefik.docker.network=proxy"
+
+#networks:
+  #proxy:
+    #external: true
